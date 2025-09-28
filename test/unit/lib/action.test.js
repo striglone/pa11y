@@ -384,13 +384,21 @@ describe('lib/action', function() {
 					assert.strictEqual(mockElement.value, 'mock-value');
 				});
 
-				it('triggers an input event on the element', function() {
-					assert.calledOnce(Event);
-					assert.calledWithExactly(Event, 'input', {
+				it('triggers input, change, and blur events on the element', function() {
+					assert.calledThrice(Event);
+					assert.calledWithExactly(Event.firstCall, 'input', {
 						bubbles: true
 					});
-					assert.calledOnce(mockElement.dispatchEvent);
-					assert.calledWithExactly(mockElement.dispatchEvent, mockEvent);
+					assert.calledWithExactly(Event.secondCall, 'change', {
+						bubbles: true
+					});
+					assert.calledWithExactly(Event.thirdCall, 'blur', {
+						bubbles: true
+					});
+					assert.calledThrice(mockElement.dispatchEvent);
+					assert.calledWithExactly(mockElement.dispatchEvent.firstCall, mockEvent);
+					assert.calledWithExactly(mockElement.dispatchEvent.secondCall, mockEvent);
+					assert.calledWithExactly(mockElement.dispatchEvent.thirdCall, mockEvent);
 				});
 
 				it('resolves with `undefined`', function() {
@@ -417,13 +425,21 @@ describe('lib/action', function() {
 						assert.strictEqual(mockElement.value, 'mock-value');
 					});
 
-					it('triggers an input event on the element', function() {
-						assert.calledTwice(Event);
-						assert.calledWithExactly(Event, 'input', {
+					it('triggers input, change, and blur events on the element', function() {
+						assert.called(Event); // Should be called 3 times for this test
+						assert.calledWithExactly(Event.getCall(0), 'input', {
 							bubbles: true
 						});
-						assert.calledOnce(mockElement.dispatchEvent);
-						assert.calledWithExactly(mockElement.dispatchEvent, mockEvent);
+						assert.calledWithExactly(Event.getCall(1), 'change', {
+							bubbles: true
+						});
+						assert.calledWithExactly(Event.getCall(2), 'blur', {
+							bubbles: true
+						});
+						assert.called(mockElement.dispatchEvent); // Should be called 3 times for this test
+						assert.calledWithExactly(mockElement.dispatchEvent.getCall(0), mockEvent);
+						assert.calledWithExactly(mockElement.dispatchEvent.getCall(1), mockEvent);
+						assert.calledWithExactly(mockElement.dispatchEvent.getCall(2), mockEvent);
 					});
 
 					it('resolves with `undefined`', function() {
@@ -566,13 +582,21 @@ describe('lib/action', function() {
 					assert.strictEqual(mockElement.value, '');
 				});
 
-				it('triggers a change event on the element', function() {
-					assert.calledOnce(Event);
-					assert.calledWithExactly(Event, 'input', {
+				it('triggers input, change, and blur events on the element', function() {
+					assert.calledThrice(Event);
+					assert.calledWithExactly(Event.firstCall, 'input', {
 						bubbles: true
 					});
-					assert.calledOnce(mockElement.dispatchEvent);
-					assert.calledWithExactly(mockElement.dispatchEvent, mockEvent);
+					assert.calledWithExactly(Event.secondCall, 'change', {
+						bubbles: true
+					});
+					assert.calledWithExactly(Event.thirdCall, 'blur', {
+						bubbles: true
+					});
+					assert.calledThrice(mockElement.dispatchEvent);
+					assert.calledWithExactly(mockElement.dispatchEvent.firstCall, mockEvent);
+					assert.calledWithExactly(mockElement.dispatchEvent.secondCall, mockEvent);
+					assert.calledWithExactly(mockElement.dispatchEvent.thirdCall, mockEvent);
 				});
 
 				it('resolves with `undefined`', function() {
@@ -599,13 +623,21 @@ describe('lib/action', function() {
 						assert.strictEqual(mockElement.value, '');
 					});
 
-					it('triggers an input event on the element', function() {
-						assert.calledTwice(Event);
-						assert.calledWithExactly(Event, 'input', {
+					it('triggers input, change, and blur events on the element', function() {
+						assert.called(Event); // Should be called 3 times for this test
+						assert.calledWithExactly(Event.getCall(0), 'input', {
 							bubbles: true
 						});
-						assert.calledOnce(mockElement.dispatchEvent);
-						assert.calledWithExactly(mockElement.dispatchEvent, mockEvent);
+						assert.calledWithExactly(Event.getCall(1), 'change', {
+							bubbles: true
+						});
+						assert.calledWithExactly(Event.getCall(2), 'blur', {
+							bubbles: true
+						});
+						assert.called(mockElement.dispatchEvent); // Should be called 3 times for this test
+						assert.calledWithExactly(mockElement.dispatchEvent.getCall(0), mockEvent);
+						assert.calledWithExactly(mockElement.dispatchEvent.getCall(1), mockEvent);
+						assert.calledWithExactly(mockElement.dispatchEvent.getCall(2), mockEvent);
 					});
 
 					it('resolves with `undefined`', function() {

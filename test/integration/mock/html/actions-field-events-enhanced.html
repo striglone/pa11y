@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Enhanced Field Events Test</title>
+</head>
+<body>
+	<h1>Enhanced Field Events Test</h1>
+	
+	<input type="text" id="test-input" placeholder="Test input field">
+	<select id="test-select">
+		<option value="">Select an option</option>
+		<option value="option1">Option 1</option>
+		<option value="option2">Option 2</option>
+	</select>
+	<textarea id="test-textarea" placeholder="Test textarea"></textarea>
+	
+	<div id="event-log"></div>
+	<div id="validation-status"></div>
+	
+	<script>
+		// Track events for testing
+		window.eventLog = [];
+		
+		function logEvent(event) {
+			window.eventLog.push({
+				type: event.type,
+				target: event.target.id,
+				value: event.target.value,
+				timestamp: Date.now()
+			});
+			document.getElementById('event-log').textContent = JSON.stringify(window.eventLog, null, 2);
+		}
+		
+		function validateEvents() {
+			const inputEvents = window.eventLog.filter(e => e.target === 'test-input');
+			const selectEvents = window.eventLog.filter(e => e.target === 'test-select');
+			const textareaEvents = window.eventLog.filter(e => e.target === 'test-textarea');
+			
+			// Check that each field has the expected event sequence: input, change, blur
+			const hasValidSequence = (events) => {
+				if (events.length < 3) return false;
+				return events[0].type === 'input' && 
+					   events[1].type === 'change' && 
+					   events[2].type === 'blur';
+			};
+			
+			const isValid = hasValidSequence(inputEvents) && 
+						   hasValidSequence(selectEvents) && 
+						   hasValidSequence(textareaEvents);
+			
+			document.getElementById('validation-status').textContent = 
+				isValid ? 'VALID: All fields have proper event sequence' : 'INVALID: Missing or incorrect event sequence';
+			
+			return isValid;
+		}
+		
+		// Add event listeners to all form elements
+		['test-input', 'test-select', 'test-textarea'].forEach(id => {
+			const element = document.getElementById(id);
+			element.addEventListener('input', logEvent);
+			element.addEventListener('change', logEvent);
+			element.addEventListener('blur', logEvent);
+			element.addEventListener('focus', logEvent);
+		});
+		
+		// Expose validation function globally for testing
+		window.validateEvents = validateEvents;
+	</script>
+</body>
+</html>
