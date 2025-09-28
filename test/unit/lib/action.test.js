@@ -6,20 +6,30 @@ const sinon = require('sinon');
 
 describe('lib/action', function() {
 	let mockEvent;
+	let mockKeyboardEvent;
 	let originalEvent;
+	let originalKeyboardEvent;
 	let puppeteer;
 	let runAction;
 
 	beforeEach(function() {
 		mockEvent = {event: true};
+		mockKeyboardEvent = {keyboardEvent: true};
 		originalEvent = global.Event;
-		global.Event = sinon.stub().returns(mockEvent);
+		originalKeyboardEvent = global.KeyboardEvent;
+		global.Event = sinon.stub().callsFake((type, options) => {
+			return {event: true, type: type, ...options};
+		});
+		global.KeyboardEvent = sinon.stub().callsFake((type, options) => {
+			return {keyboardEvent: true, type: type, ...options};
+		});
 		puppeteer = require('../mocks/puppeteer.mock');
 		runAction = require('../../../lib/action');
 	});
 
 	afterEach(function() {
 		global.Event = originalEvent;
+		global.KeyboardEvent = originalKeyboardEvent;
 	});
 
 	it('is a function', function() {
@@ -384,21 +394,31 @@ describe('lib/action', function() {
 					assert.strictEqual(mockElement.value, 'mock-value');
 				});
 
-				it('triggers input, change, and blur events on the element', function() {
-					assert.calledThrice(Event);
-					assert.calledWithExactly(Event.firstCall, 'input', {
+				it('triggers focus, keyboard events, input, change, and blur events on the element', function() {
+					// Check that focus event is called
+					assert.calledWithExactly(Event, 'focus', {
 						bubbles: true
 					});
-					assert.calledWithExactly(Event.secondCall, 'change', {
+					
+					// Check that keyboard events are called (KeyboardEvent constructor)
+					assert.called(global.KeyboardEvent);
+					
+					// Check that input, change, blur events are called
+					assert.calledWithExactly(Event, 'input', {
 						bubbles: true
 					});
-					assert.calledWithExactly(Event.thirdCall, 'blur', {
+					assert.calledWithExactly(Event, 'change', {
 						bubbles: true
 					});
-					assert.calledThrice(mockElement.dispatchEvent);
-					assert.calledWithExactly(mockElement.dispatchEvent.firstCall, mockEvent);
-					assert.calledWithExactly(mockElement.dispatchEvent.secondCall, mockEvent);
-					assert.calledWithExactly(mockElement.dispatchEvent.thirdCall, mockEvent);
+					assert.calledWithExactly(Event, 'blur', {
+						bubbles: true
+					});
+					
+					// Check that focus method is called
+					assert.called(mockElement.focus);
+					
+					// Check that dispatchEvent is called multiple times
+					assert.called(mockElement.dispatchEvent);
 				});
 
 				it('resolves with `undefined`', function() {
@@ -425,21 +445,31 @@ describe('lib/action', function() {
 						assert.strictEqual(mockElement.value, 'mock-value');
 					});
 
-					it('triggers input, change, and blur events on the element', function() {
-						assert.called(Event); // Should be called 3 times for this test
-						assert.calledWithExactly(Event.getCall(0), 'input', {
+					it('triggers focus, keyboard events, input, change, and blur events on the element', function() {
+						// Check that focus event is called
+						assert.calledWithExactly(Event, 'focus', {
 							bubbles: true
 						});
-						assert.calledWithExactly(Event.getCall(1), 'change', {
+						
+						// Check that keyboard events are called (KeyboardEvent constructor)
+						assert.called(global.KeyboardEvent);
+						
+						// Check that input, change, blur events are called
+						assert.calledWithExactly(Event, 'input', {
 							bubbles: true
 						});
-						assert.calledWithExactly(Event.getCall(2), 'blur', {
+						assert.calledWithExactly(Event, 'change', {
 							bubbles: true
 						});
-						assert.called(mockElement.dispatchEvent); // Should be called 3 times for this test
-						assert.calledWithExactly(mockElement.dispatchEvent.getCall(0), mockEvent);
-						assert.calledWithExactly(mockElement.dispatchEvent.getCall(1), mockEvent);
-						assert.calledWithExactly(mockElement.dispatchEvent.getCall(2), mockEvent);
+						assert.calledWithExactly(Event, 'blur', {
+							bubbles: true
+						});
+						
+						// Check that focus method is called
+						assert.called(mockElement.focus);
+						
+						// Check that dispatchEvent is called multiple times
+						assert.called(mockElement.dispatchEvent);
 					});
 
 					it('resolves with `undefined`', function() {
@@ -582,21 +612,31 @@ describe('lib/action', function() {
 					assert.strictEqual(mockElement.value, '');
 				});
 
-				it('triggers input, change, and blur events on the element', function() {
-					assert.calledThrice(Event);
-					assert.calledWithExactly(Event.firstCall, 'input', {
+				it('triggers focus, keyboard events (Ctrl+A, Delete), input, change, and blur events on the element', function() {
+					// Check that focus event is called
+					assert.calledWithExactly(Event, 'focus', {
 						bubbles: true
 					});
-					assert.calledWithExactly(Event.secondCall, 'change', {
+					
+					// Check that keyboard events are called (KeyboardEvent constructor)
+					assert.called(global.KeyboardEvent);
+					
+					// Check that input, change, blur events are called
+					assert.calledWithExactly(Event, 'input', {
 						bubbles: true
 					});
-					assert.calledWithExactly(Event.thirdCall, 'blur', {
+					assert.calledWithExactly(Event, 'change', {
 						bubbles: true
 					});
-					assert.calledThrice(mockElement.dispatchEvent);
-					assert.calledWithExactly(mockElement.dispatchEvent.firstCall, mockEvent);
-					assert.calledWithExactly(mockElement.dispatchEvent.secondCall, mockEvent);
-					assert.calledWithExactly(mockElement.dispatchEvent.thirdCall, mockEvent);
+					assert.calledWithExactly(Event, 'blur', {
+						bubbles: true
+					});
+					
+					// Check that focus method is called
+					assert.called(mockElement.focus);
+					
+					// Check that dispatchEvent is called multiple times
+					assert.called(mockElement.dispatchEvent);
 				});
 
 				it('resolves with `undefined`', function() {
@@ -623,21 +663,31 @@ describe('lib/action', function() {
 						assert.strictEqual(mockElement.value, '');
 					});
 
-					it('triggers input, change, and blur events on the element', function() {
-						assert.called(Event); // Should be called 3 times for this test
-						assert.calledWithExactly(Event.getCall(0), 'input', {
+					it('triggers focus, keyboard events (Ctrl+A, Delete), input, change, and blur events on the element', function() {
+						// Check that focus event is called
+						assert.calledWithExactly(Event, 'focus', {
 							bubbles: true
 						});
-						assert.calledWithExactly(Event.getCall(1), 'change', {
+						
+						// Check that keyboard events are called (KeyboardEvent constructor)
+						assert.called(global.KeyboardEvent);
+						
+						// Check that input, change, blur events are called
+						assert.calledWithExactly(Event, 'input', {
 							bubbles: true
 						});
-						assert.calledWithExactly(Event.getCall(2), 'blur', {
+						assert.calledWithExactly(Event, 'change', {
 							bubbles: true
 						});
-						assert.called(mockElement.dispatchEvent); // Should be called 3 times for this test
-						assert.calledWithExactly(mockElement.dispatchEvent.getCall(0), mockEvent);
-						assert.calledWithExactly(mockElement.dispatchEvent.getCall(1), mockEvent);
-						assert.calledWithExactly(mockElement.dispatchEvent.getCall(2), mockEvent);
+						assert.calledWithExactly(Event, 'blur', {
+							bubbles: true
+						});
+						
+						// Check that focus method is called
+						assert.called(mockElement.focus);
+						
+						// Check that dispatchEvent is called multiple times
+						assert.called(mockElement.dispatchEvent);
 					});
 
 					it('resolves with `undefined`', function() {

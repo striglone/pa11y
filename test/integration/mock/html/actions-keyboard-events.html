@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Keyboard Events Test</title>
+</head>
+<body>
+	<h1>Keyboard Events Test</h1>
+	
+	<input type="text" id="test-input" placeholder="Test input field">
+	<select id="test-select">
+		<option value="">Select an option</option>
+		<option value="option1">Option 1</option>
+		<option value="option2">Option 2</option>
+	</select>
+	<textarea id="test-textarea" placeholder="Test textarea"></textarea>
+	
+	<div id="event-log"></div>
+	<div id="keyboard-log"></div>
+	<div id="validation-status"></div>
+	
+	<script>
+		// Track events for testing
+		window.eventLog = [];
+		window.keyboardLog = [];
+		
+		function logEvent(event) {
+			window.eventLog.push({
+				type: event.type,
+				target: event.target.id,
+				value: event.target.value,
+				timestamp: Date.now()
+			});
+			document.getElementById('event-log').textContent = JSON.stringify(window.eventLog, null, 2);
+		}
+		
+		function logKeyboardEvent(event) {
+			window.keyboardLog.push({
+				type: event.type,
+				target: event.target.id,
+				key: event.key,
+				code: event.code,
+				keyCode: event.keyCode,
+				ctrlKey: event.ctrlKey,
+				timestamp: Date.now()
+			});
+			document.getElementById('keyboard-log').textContent = JSON.stringify(window.keyboardLog, null, 2);
+		}
+		
+		function validateEvents() {
+			const inputEvents = window.eventLog.filter(e => e.target === 'test-input');
+			const inputKeyboardEvents = window.keyboardLog.filter(e => e.target === 'test-input');
+			
+			// Check that we have the expected event sequence
+			const hasFocus = inputEvents.some(e => e.type === 'focus');
+			const hasInput = inputEvents.some(e => e.type === 'input');
+			const hasChange = inputEvents.some(e => e.type === 'change');
+			const hasBlur = inputEvents.some(e => e.type === 'blur');
+			
+			// Check that we have keyboard events
+			const hasKeyboardEvents = inputKeyboardEvents.length > 0;
+			const hasKeydown = inputKeyboardEvents.some(e => e.type === 'keydown');
+			const hasKeypress = inputKeyboardEvents.some(e => e.type === 'keypress');
+			const hasKeyup = inputKeyboardEvents.some(e => e.type === 'keyup');
+			
+			const isValid = hasFocus && hasInput && hasChange && hasBlur && 
+						   hasKeyboardEvents && hasKeydown && hasKeypress && hasKeyup;
+			
+			document.getElementById('validation-status').textContent = 
+				isValid ? 'VALID: All events including keyboard events detected' : 
+				'INVALID: Missing events - Focus:' + hasFocus + ' Input:' + hasInput + ' Change:' + hasChange + ' Blur:' + hasBlur + ' Keyboard:' + hasKeyboardEvents;
+			
+			return isValid;
+		}
+		
+		// Add event listeners to all form elements
+		['test-input', 'test-select', 'test-textarea'].forEach(id => {
+			const element = document.getElementById(id);
+			
+			// Regular events
+			element.addEventListener('focus', logEvent);
+			element.addEventListener('input', logEvent);
+			element.addEventListener('change', logEvent);
+			element.addEventListener('blur', logEvent);
+			
+			// Keyboard events
+			element.addEventListener('keydown', logKeyboardEvent);
+			element.addEventListener('keypress', logKeyboardEvent);
+			element.addEventListener('keyup', logKeyboardEvent);
+		});
+		
+		// Expose validation function globally for testing
+		window.validateEvents = validateEvents;
+	</script>
+</body>
+</html>

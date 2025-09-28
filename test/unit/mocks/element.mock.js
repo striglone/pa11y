@@ -14,6 +14,7 @@ const initMockElementProperties = function() {
 		childNodes: [],
 		contains: sinon.stub().returns(false),
 		dispatchEvent: sinon.stub(),
+		focus: sinon.stub(),
 		getClientRects: sinon.stub().returns([]),
 		id: null,
 		innerHTML: 'mock-html',

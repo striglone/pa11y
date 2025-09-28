@@ -1,0 +1,8 @@
+{
+	"actions": [
+		"set field #test-input to hello world",
+		"set field #test-select to option1",
+		"set field #test-textarea to keyboard events test",
+		"clear field #test-input"
+	]
+}
