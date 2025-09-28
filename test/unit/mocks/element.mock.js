@@ -30,6 +30,7 @@ const initMockElementProperties = function() {
 
 function MockElement() {
 	Object.assign(this, initMockElementProperties());
+	this.elementValue = ''; // Initialize value to empty string
 }
 
 MockElement.prototype = {
@@ -60,5 +61,6 @@ function createMockPrototypeElement(data = {}) {
 
 function createMockElement(data = {}) {
 	const element = Object.assign(initMockElementProperties(), data);
+	element.elementValue = ''; // Initialize value to empty string
 	return connectToDOM(element);
 }
